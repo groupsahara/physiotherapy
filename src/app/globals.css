@@ -1,26 +1,233 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens.
+ * Components only use semantic utilities (bg-surface, text-muted, …) mapped
+ * from these variables, so switching theme is a single attribute flip on
+ * <html data-theme> with zero component changes.
+ */
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #ffffff;
+  --bg-subtle: #f3f7fd;
+  --surface: #ffffff;
+  --surface-2: #edf3fc;
+  --fg: #0a1a33;
+  --fg-muted: #51627c;
+  --border: #e1e8f2;
+  --primary: #1557d6;
+  --primary-hover: #0f46b3;
+  --primary-soft: #e8f0fe;
+  --primary-fg: #ffffff;
+  --brand-text: #1453cc;
+  --star: #f59e0b;
+  --footer-bg: #061733;
+  --hero-glow: rgb(21 87 214 / 0.12);
+  --grid-line: rgb(21 87 214 / 0.07);
+  --shadow-card: 0 1px 2px rgb(15 35 75 / 0.04), 0 16px 40px -20px rgb(15 35 75 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(15 35 75 / 0.05), 0 28px 60px -24px rgb(15 35 75 / 0.3);
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #050f22;
+  --bg-subtle: #081631;
+  --surface: #0b1c3b;
+  --surface-2: #10264d;
+  --fg: #e8effb;
+  --fg-muted: #9aaecf;
+  --border: #1a3260;
+  --primary: #2f6fe4;
+  --primary-hover: #4683f0;
+  --primary-soft: rgb(77 141 255 / 0.14);
+  --primary-fg: #ffffff;
+  --brand-text: #8ab6ff;
+  --star: #fbbf24;
+  --footer-bg: #030a18;
+  --hero-glow: rgb(59 130 246 / 0.22);
+  --grid-line: rgb(138 182 255 / 0.06);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px -20px rgb(0 0 0 / 0.6);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 28px 60px -24px rgb(0 0 0 / 0.75);
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--fg-muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-fg: var(--primary-fg);
+  --color-brand: var(--brand-text);
+  --color-star: var(--star);
+  --color-footer: var(--footer-bg);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-lift: var(--shadow-lift);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand-text);
+    outline-offset: 3px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brand-text);
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 1.5rem;
+    height: 2px;
+    border-radius: 9999px;
+    background: currentColor;
+  }
+
+  .card {
+    border-radius: 1.5rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .field {
+    width: 100%;
+    height: 3rem;
+    border-radius: 0.875rem;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    padding: 0 1rem;
+    font-size: 0.9375rem;
+    color: var(--fg);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .field::placeholder {
+    color: var(--fg-muted);
+    opacity: 0.75;
+  }
+
+  .field:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-soft);
+  }
+
+  .field[aria-invalid="true"] {
+    border-color: #dc2626;
+  }
+
+  textarea.field {
+    height: auto;
+    min-height: 6.5rem;
+    padding: 0.75rem 1rem;
+    resize: vertical;
+  }
+
+  select.field {
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d8ba3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    background-size: 1.1rem;
+  }
+}
+
+/* Scroll reveal — only hides content once JS has confirmed it can reveal it. */
+:root[data-js] [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+[data-reveal] {
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+/* Smooth cross-fade when the theme changes (View Transitions API). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  :root[data-js] [data-reveal]:not([data-revealed]) {
+    opacity: 1;
+    transform: none;
+  }
 }

@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Moving Cure — Physiotherapy Clinic Website
 
-## Getting Started
+Website for **Moving Cure Physiotherapy Clinic & Rehabilitation Centre**, Vishwas Nagar, Delhi —
+Dr. Deepak, BPT (D.U.), DCPT.
 
-First, run the development server:
+Built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4 and Zod.
+White theme by default with a blue dark theme toggle.
+
+## Sections
+
+Hero · Credentials strip · About · Treatments (8 conditions) · Our Approach · Session gallery (lightbox) ·
+Home-visit banner · Patient stories · FAQ · Contact & appointment booking (with map) · Footer.
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # production build (all routes prerendered)
+npm start          # serve the production build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Copy `.env.example` to `.env.local` and fill in what you need — everything is optional:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | Public URL, used for canonical links, sitemap and social cards |
+| `RESEND_API_KEY`, `APPOINTMENT_EMAIL_TO`, `APPOINTMENT_EMAIL_FROM` | Email each booking to the clinic via [Resend](https://resend.com) |
+| `APPOINTMENT_WEBHOOK_URL` | POST each booking as JSON (Slack, Discord, Zapier, Google Sheets via Apps Script…) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Without a delivery channel, bookings are logged on the server and the patient is asked to confirm on
+WhatsApp (pre-filled message) or by phone.
 
-## Learn More
+## Editing content
 
-To learn more about Next.js, take a look at the following resources:
+| What | Where |
+| --- | --- |
+| Clinic name, phones, email, address, WhatsApp number | `src/config/site.ts` |
+| Treatments | `src/content/services.ts` |
+| FAQs | `src/content/faqs.ts` |
+| Testimonials (**samples — replace before launch**) | `src/content/testimonials.ts` |
+| Photos and captions | `src/assets/images/` + `src/content/media.ts` |
+| Colours (light / dark) | tokens at the top of `src/app/globals.css` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Architecture
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the system design, low-level design, diagrams and
+extension points.
 
-## Deploy on Vercel
+## Photo credits
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Session photos are royalty-free stock images from Pexels and Unsplash (sources listed in
+`src/content/media.ts`). Replace them with real clinic photos whenever available.
