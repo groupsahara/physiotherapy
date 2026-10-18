@@ -29,11 +29,16 @@ export function addressLines(address: PostalAddress): string[] {
   ];
 }
 
-export function mapsDirectionsHref(address: PostalAddress) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formatAddress(address))}`;
+/** Business name + address, so Google resolves the clinic's own listing (address is the fallback). */
+function mapsQuery(placeName: string, address: PostalAddress) {
+  return encodeURIComponent(`${placeName}, ${formatAddress(address)}`);
+}
+
+export function mapsDirectionsHref(placeName: string, address: PostalAddress) {
+  return `https://www.google.com/maps/search/?api=1&query=${mapsQuery(placeName, address)}`;
 }
 
 /** Key-less Google Maps embed URL. */
-export function mapsEmbedSrc(address: PostalAddress) {
-  return `https://maps.google.com/maps?q=${encodeURIComponent(formatAddress(address))}&z=16&output=embed`;
+export function mapsEmbedSrc(placeName: string, address: PostalAddress) {
+  return `https://maps.google.com/maps?q=${mapsQuery(placeName, address)}&z=16&output=embed`;
 }

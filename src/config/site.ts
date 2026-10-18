@@ -35,6 +35,7 @@ export const siteConfig = {
       postalCode: "110032",
       countryCode: "IN",
     },
+    mapsPlaceName: "Moving Cure Physiotherapy Clinic & Rehabilitation Center",
   },
   policies: {
     homeVisitOnCall: true,

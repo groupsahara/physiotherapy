@@ -9,7 +9,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 
 export function ContactSection() {
-  const { phones, email, address } = siteConfig.contact;
+  const { phones, email, address, mapsPlaceName } = siteConfig.contact;
 
   return (
     <Section id="contact" labelledBy="contact-title">
@@ -31,7 +31,7 @@ export function ContactSection() {
               ))}
             </address>
             <a
-              href={mapsDirectionsHref(address)}
+              href={mapsDirectionsHref(mapsPlaceName, address)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-brand hover:underline"
@@ -69,7 +69,7 @@ export function ContactSection() {
       <Reveal className="mt-8 overflow-hidden rounded-3xl border border-border bg-surface-2 shadow-card">
         <iframe
           title={`Map showing ${siteConfig.name} clinic, ${address.locality}`}
-          src={mapsEmbedSrc(address)}
+          src={mapsEmbedSrc(mapsPlaceName, address)}
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           className="block h-85 w-full border-0 dark:[filter:invert(0.9)_hue-rotate(180deg)_saturate(0.8)]"
