@@ -45,6 +45,8 @@ export interface SiteConfig {
     whatsapp: string;
     email: string;
     address: PostalAddress;
+    /** Business name exactly as listed on Google Maps — pins the listing rather than a bare address. */
+    mapsPlaceName: string;
   };
   policies: {
     homeVisitOnCall: boolean;

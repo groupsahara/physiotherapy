@@ -9,7 +9,7 @@ import { Logo } from "@/components/ui/Logo";
 import { CurrentYear } from "./CurrentYear";
 
 export function SiteFooter() {
-  const { phones, email, address } = siteConfig.contact;
+  const { phones, email, address, mapsPlaceName } = siteConfig.contact;
 
   return (
     <footer className="relative overflow-hidden bg-footer text-blue-100/80">
@@ -49,7 +49,7 @@ export function SiteFooter() {
 
         <FooterColumn title="Contact" className="lg:col-span-3">
           <li>
-            <a href={mapsDirectionsHref(address)} target="_blank" rel="noopener noreferrer" className="flex gap-3 hover:text-white">
+            <a href={mapsDirectionsHref(mapsPlaceName, address)} target="_blank" rel="noopener noreferrer" className="flex gap-3 hover:text-white">
               <MapPin aria-hidden className="mt-0.5 size-4 shrink-0 text-blue-300" />
               <address className="not-italic">
                 {addressLines(address).map((line) => (
