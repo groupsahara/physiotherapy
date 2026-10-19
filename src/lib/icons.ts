@@ -1,0 +1,110 @@
+import {
+  Accessibility,
+  Activity,
+  Ambulance,
+  Armchair,
+  Award,
+  Baby,
+  BadgeCheck,
+  Bike,
+  Bone,
+  Brain,
+  CalendarCheck,
+  ClipboardList,
+  Clock,
+  Dumbbell,
+  Flame,
+  Footprints,
+  GraduationCap,
+  Hand,
+  HandHeart,
+  HeartHandshake,
+  HeartPulse,
+  Hospital,
+  House,
+  Leaf,
+  Medal,
+  Microscope,
+  Move,
+  PersonStanding,
+  Pill,
+  Scan,
+  ShieldCheck,
+  Smile,
+  Snowflake,
+  Sparkles,
+  Star,
+  Stethoscope,
+  Syringe,
+  Target,
+  ThumbsUp,
+  Timer,
+  UserRound,
+  Users,
+  Waves,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
+
+/**
+ * CMS icon names (kebab-case Lucide names, allow-listed by the backend as `ICON_NAMES`)
+ * mapped to components. Only Server Components render CMS icons, so this map never
+ * ships to the browser.
+ */
+const ICONS = {
+  accessibility: Accessibility,
+  activity: Activity,
+  ambulance: Ambulance,
+  armchair: Armchair,
+  award: Award,
+  baby: Baby,
+  "badge-check": BadgeCheck,
+  bike: Bike,
+  bone: Bone,
+  brain: Brain,
+  "calendar-check": CalendarCheck,
+  "clipboard-list": ClipboardList,
+  clock: Clock,
+  dumbbell: Dumbbell,
+  flame: Flame,
+  footprints: Footprints,
+  "graduation-cap": GraduationCap,
+  hand: Hand,
+  "hand-heart": HandHeart,
+  "heart-handshake": HeartHandshake,
+  "heart-pulse": HeartPulse,
+  hospital: Hospital,
+  house: House,
+  leaf: Leaf,
+  medal: Medal,
+  microscope: Microscope,
+  move: Move,
+  "person-standing": PersonStanding,
+  pill: Pill,
+  scan: Scan,
+  "shield-check": ShieldCheck,
+  smile: Smile,
+  snowflake: Snowflake,
+  sparkles: Sparkles,
+  star: Star,
+  stethoscope: Stethoscope,
+  syringe: Syringe,
+  target: Target,
+  "thumbs-up": ThumbsUp,
+  timer: Timer,
+  "user-round": UserRound,
+  users: Users,
+  waves: Waves,
+  zap: Zap,
+} satisfies Record<string, LucideIcon>;
+
+export type IconName = keyof typeof ICONS;
+
+/** Shown for an empty or unknown icon name. */
+const FALLBACK_ICON: LucideIcon = Sparkles;
+
+const isIconName = (name: string): name is IconName => Object.hasOwn(ICONS, name);
+
+export function iconFor(name: string): LucideIcon {
+  return isIconName(name) ? ICONS[name] : FALLBACK_ICON;
+}

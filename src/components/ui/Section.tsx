@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
-import type { SectionId } from "@/types/content";
+import type { NavTarget } from "@/lib/cms/types";
 import { cn } from "@/lib/cn";
 import { Container } from "./Container";
 
 interface SectionProps {
-  id: SectionId;
+  /** In-page anchor; navigation links target these ids. */
+  id: NavTarget;
   /** id of the heading that labels this landmark. */
   labelledBy: string;
   tone?: "default" | "subtle";

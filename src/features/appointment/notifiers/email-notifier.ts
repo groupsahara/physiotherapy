@@ -3,8 +3,10 @@ import type { AppointmentNotifier } from "../types";
 
 interface EmailNotifierOptions {
   apiKey: string;
-  from: string;
-  to: string;
+  /** Defaults to "<clinic name> <onboarding@resend.dev>". */
+  from?: string;
+  /** Defaults to the clinic email from the CMS. */
+  to?: string;
 }
 
 /** Sends the booking to the clinic inbox via Resend's REST API (no SDK needed). */
@@ -12,7 +14,10 @@ export function createEmailNotifier({ apiKey, from, to }: EmailNotifierOptions):
   return {
     channel: "email",
     reachesClinic: true,
-    async notify(appointment) {
+    async notify(appointment, context) {
+      const recipient = to ?? context.clinicEmail;
+      if (!recipient) throw new Error("No recipient: set APPOINTMENT_EMAIL_TO or the clinic email in the CMS");
+
       const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -20,10 +25,10 @@ export function createEmailNotifier({ apiKey, from, to }: EmailNotifierOptions):
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from,
-          to: [to],
+          from: from ?? `${context.clinicName || "Website"} <onboarding@resend.dev>`,
+          to: [recipient],
           subject: `New appointment: ${appointment.name} (${appointment.referenceId})`,
-          text: formatStaffSummary(appointment),
+          text: formatStaffSummary(appointment, context),
         }),
         signal: AbortSignal.timeout(8_000),
       });

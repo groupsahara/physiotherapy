@@ -1,53 +1,71 @@
-import type { SiteConfig } from "@/types/site";
-import type { Faq, Service } from "@/types/content";
+import { joinParts } from "@/lib/contact-links";
+import type { Faq, Site } from "@/lib/cms/types";
 
 /**
  * schema.org JSON-LD builders. `Physiotherapy` is a MedicalBusiness subtype,
  * which lets search engines show the clinic as a local medical business.
+ * Empty CMS values are left out rather than published as blanks.
  */
 
-export function buildClinicJsonLd(site: SiteConfig, services: readonly Service[]) {
-  const { address } = site.contact;
+type JsonObject = Record<string, unknown>;
 
-  return {
+function compact(object: JsonObject): JsonObject {
+  return Object.fromEntries(
+    Object.entries(object).filter(
+      ([, value]) => value !== undefined && value !== "" && !(Array.isArray(value) && value.length === 0),
+    ),
+  );
+}
+
+/** @param origin public site origin; @param image absolute share-image URL. */
+export function buildClinicJsonLd(site: Site, origin: string, image: string): JsonObject {
+  const {
+    "site.identity": identity,
+    "site.seo": seo,
+    "site.contact": contact,
+    "site.practitioner": practitioner,
+  } = site.documents;
+  const { address } = contact;
+
+  return compact({
     "@context": "https://schema.org",
     "@type": "Physiotherapy",
-    "@id": `${site.url}/#clinic`,
-    name: site.legalName,
-    alternateName: site.name,
-    description: site.description,
-    url: site.url,
-    image: `${site.url}/opengraph-image`,
-    telephone: site.contact.phones.map((phone) => phone.e164),
-    email: site.contact.email,
-    address: {
+    "@id": `${origin}/#clinic`,
+    name: identity.legalName || identity.name,
+    alternateName: identity.legalName ? identity.name : undefined,
+    description: seo.description,
+    url: origin,
+    image,
+    telephone: contact.phones.map((phone) => phone.e164),
+    email: contact.email,
+    address: compact({
       "@type": "PostalAddress",
-      streetAddress: `${address.street}, ${address.landmark}`,
-      addressLocality: `${address.locality}, ${address.city}`,
+      streetAddress: joinParts([address.street, address.landmark], ", "),
+      addressLocality: joinParts([address.locality, address.city], ", "),
       addressRegion: address.region,
       postalCode: address.postalCode,
       addressCountry: address.countryCode,
-    },
-    areaServed: { "@type": "City", name: address.city },
+    }),
+    areaServed: address.city ? { "@type": "City", name: address.city } : undefined,
     medicalSpecialty: "PhysicalTherapy",
-    availableService: services.map((service) => ({
-      "@type": "MedicalTherapy",
-      name: `${service.title} physiotherapy`,
-      description: service.summary,
-    })),
-    employee: {
-      "@type": "Person",
-      name: site.practitioner.name,
-      jobTitle: "Physiotherapist",
-      hasCredential: site.practitioner.qualifications.map((name) => ({
-        "@type": "EducationalOccupationalCredential",
-        name,
-      })),
-    },
-  };
+    availableService: site.collections.treatments.map((treatment) =>
+      compact({ "@type": "MedicalTherapy", name: treatment.title, description: treatment.summary }),
+    ),
+    employee: practitioner.name
+      ? compact({
+          "@type": "Person",
+          name: practitioner.name,
+          jobTitle: practitioner.jobTitle,
+          hasCredential: practitioner.qualifications.map((name) => ({
+            "@type": "EducationalOccupationalCredential",
+            name,
+          })),
+        })
+      : undefined,
+  });
 }
 
-export function buildFaqJsonLd(faqs: readonly Faq[]) {
+export function buildFaqJsonLd(faqs: readonly Faq[]): JsonObject {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",

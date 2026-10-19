@@ -1,11 +1,11 @@
-import type { ServerEnv } from "@/lib/env";
+import type { NotifierEnv } from "@/lib/env";
 import type { AppointmentNotifier } from "../types";
 import { createConsoleNotifier } from "./console-notifier";
 import { createEmailNotifier } from "./email-notifier";
 import { createWebhookNotifier } from "./webhook-notifier";
 
-/** Factory: builds the active notifier chain from configuration. */
-export function createNotifiersFromEnv(env: ServerEnv): AppointmentNotifier[] {
+/** Factory: builds the optional extra notifier chain from configuration. */
+export function createNotifiersFromEnv(env: NotifierEnv): AppointmentNotifier[] {
   const notifiers: AppointmentNotifier[] = [createConsoleNotifier()];
 
   if (env.RESEND_API_KEY) {

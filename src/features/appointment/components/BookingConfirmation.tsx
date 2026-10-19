@@ -2,21 +2,37 @@
 
 import { useEffect, useRef } from "react";
 import { CircleCheck, Phone, RotateCcw } from "lucide-react";
-import { primaryPhone } from "@/config/site";
-import { telHref } from "@/lib/contact-links";
+import type { LinkAction } from "@/lib/cms/selectors";
 import { buttonClasses } from "@/components/ui/button";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import type { AppointmentFormState } from "../types";
 
 type SuccessState = Extract<AppointmentFormState, { status: "success" }>;
 
-export function BookingConfirmation({ result, onBookAnother }: { result: SuccessState; onBookAnother: () => void }) {
+interface BookingConfirmationProps {
+  result: SuccessState;
+  /** Shown when the request reached the clinic. */
+  successMessage: string;
+  /** Shown when it could not be stored: the patient should confirm on WhatsApp / by phone. */
+  fallbackMessage: string;
+  callAction: LinkAction | null;
+  onBookAnother: () => void;
+}
+
+export function BookingConfirmation({
+  result,
+  successMessage,
+  fallbackMessage,
+  callAction,
+  onBookAnother,
+}: BookingConfirmationProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   // Move focus to the result so screen-reader and keyboard users land on it.
   useEffect(() => headingRef.current?.focus(), []);
 
   const { delivered, patientName, referenceId, whatsappUrl } = result;
+  const message = delivered ? successMessage : fallbackMessage;
 
   return (
     <div className="flex flex-col items-center py-6 text-center" aria-live="polite">
@@ -28,26 +44,28 @@ export function BookingConfirmation({ result, onBookAnother }: { result: Success
         {delivered ? `Thank you${patientName ? `, ${patientName}` : ""}!` : `One last step${patientName ? `, ${patientName}` : ""}`}
       </h3>
 
-      <p className="mt-3 max-w-md text-[15.5px] leading-relaxed text-muted">
-        {delivered
-          ? "Your request has reached our clinic. We'll call you shortly to confirm your appointment. For a faster reply, send it to us on WhatsApp too."
-          : "Please send your request to us on WhatsApp — it's pre-filled with your details — or give us a call, and we'll confirm your slot."}
-      </p>
+      {message ? <p className="mt-3 max-w-md text-[15.5px] leading-relaxed text-muted">{message}</p> : null}
 
       <p className="mt-4 rounded-full bg-primary-soft px-4 py-1.5 text-sm font-semibold text-brand">
         Reference: {referenceId}
       </p>
 
-      <div className="mt-7 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className={buttonClasses({ variant: "whatsapp", size: "lg" })}>
-          <WhatsAppIcon className="size-5" />
-          Send on WhatsApp
-        </a>
-        <a href={telHref(primaryPhone)} className={buttonClasses({ variant: "outline", size: "lg" })}>
-          <Phone aria-hidden className="size-5" />
-          Call {primaryPhone.display}
-        </a>
-      </div>
+      {(whatsappUrl || callAction) && (
+        <div className="mt-7 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+          {whatsappUrl && (
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className={buttonClasses({ variant: "whatsapp", size: "lg" })}>
+              <WhatsAppIcon className="size-5" />
+              Send on WhatsApp
+            </a>
+          )}
+          {callAction && (
+            <a href={callAction.href} className={buttonClasses({ variant: "outline", size: "lg" })}>
+              <Phone aria-hidden className="size-5" />
+              {callAction.label}
+            </a>
+          )}
+        </div>
+      )}
 
       <button type="button" onClick={onBookAnother} className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-muted hover:text-brand">
         <RotateCcw aria-hidden className="size-4" />

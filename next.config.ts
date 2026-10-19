@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { getMediaOrigins, toRemotePattern } from "./src/lib/cms/origins";
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -17,6 +18,9 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/avif", "image/webp"],
+    // CMS images: site-relative files from public/ plus uploads served by the API
+    // (`API_URL` + `/media/**`) or any extra origin listed in `MEDIA_ORIGINS`.
+    remotePatterns: getMediaOrigins().map(toRemotePattern),
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
