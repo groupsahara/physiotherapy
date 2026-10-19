@@ -4,8 +4,10 @@ import { Reveal } from "./Reveal";
 
 interface SectionHeadingProps {
   id: string;
-  eyebrow: string;
+  /** Hidden when empty. */
+  eyebrow?: string;
   title: ReactNode;
+  /** Hidden when empty. */
   description?: ReactNode;
   align?: "left" | "center";
   className?: string;
@@ -27,7 +29,7 @@ export function SectionHeading({
         className,
       )}
     >
-      <p className="eyebrow">{eyebrow}</p>
+      {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
       <h2 id={id} className="mt-3 font-display text-3xl font-bold tracking-tight text-balance sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15]">
         {title}
       </h2>

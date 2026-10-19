@@ -1,9 +1,12 @@
-import type { PhoneNumber, PostalAddress } from "@/types/site";
+import type { PhoneNumber, PostalAddress } from "@/lib/cms/types";
 
 /**
  * Pure builders for every outbound contact link. Components never
  * hand-assemble `tel:`/`mailto:`/WhatsApp/Maps URLs — they call these.
  */
+
+/** Joins the non-empty parts. */
+export const joinParts = (parts: readonly string[], separator: string) => parts.filter(Boolean).join(separator);
 
 export const telHref = (phone: PhoneNumber) => `tel:${phone.e164}`;
 
@@ -17,21 +20,24 @@ export function whatsappHref(number: string, message?: string) {
 }
 
 export function formatAddress(address: PostalAddress): string {
-  return `${address.street}, ${address.landmark}, ${address.locality}, ${address.city} - ${address.postalCode}`;
+  return joinParts(
+    [address.street, address.landmark, address.locality, joinParts([address.city, address.postalCode], " - ")],
+    ", ",
+  );
 }
 
-/** Address lines for multi-line display (cards, footer). */
+/** Address lines for multi-line display (cards, footer). Empty lines are skipped. */
 export function addressLines(address: PostalAddress): string[] {
   return [
     address.street,
-    `${address.landmark}, ${address.locality}`,
-    `${address.city} - ${address.postalCode}`,
-  ];
+    joinParts([address.landmark, address.locality], ", "),
+    joinParts([address.city, address.postalCode], " - "),
+  ].filter(Boolean);
 }
 
 /** Business name + address, so Google resolves the clinic's own listing (address is the fallback). */
 function mapsQuery(placeName: string, address: PostalAddress) {
-  return encodeURIComponent(`${placeName}, ${formatAddress(address)}`);
+  return encodeURIComponent(joinParts([placeName, formatAddress(address)], ", "));
 }
 
 export function mapsDirectionsHref(placeName: string, address: PostalAddress) {

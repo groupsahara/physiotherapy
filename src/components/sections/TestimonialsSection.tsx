@@ -1,26 +1,27 @@
 import { Quote, Star } from "lucide-react";
-import { testimonials } from "@/content/testimonials";
+import type { Site } from "@/lib/cms/types";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 
-export function TestimonialsSection() {
-  if (testimonials.length === 0) return null;
+export function TestimonialsSection({ site }: { site: Site }) {
+  const content = site.documents["section.testimonials"];
+  const testimonials = site.collections.testimonials;
 
   return (
     <Section id="testimonials" labelledBy="testimonials-title">
       <SectionHeading
         id="testimonials-title"
-        eyebrow="Patient stories"
-        title="Back to the things they love"
-        description="What patients say about recovering with Moving Cure."
+        eyebrow={content.eyebrow}
+        title={content.title}
+        description={content.description}
       />
 
       <ul className="mt-14 grid gap-6 md:grid-cols-3">
         {testimonials.map((testimonial, i) => (
           <Reveal
             as="li"
-            key={testimonial.name}
+            key={testimonial.id}
             delay={i * 100}
             className="card relative flex flex-col p-7 transition-shadow duration-300 hover:shadow-lift"
           >
@@ -46,7 +47,7 @@ export function TestimonialsSection() {
               </span>
               <span>
                 <span className="block font-display font-bold">{testimonial.name}</span>
-                <span className="text-sm text-muted">{testimonial.context}</span>
+                {testimonial.context ? <span className="text-sm text-muted">{testimonial.context}</span> : null}
               </span>
             </footer>
           </Reveal>

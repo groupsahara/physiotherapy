@@ -1,4 +1,5 @@
-import type { AppointmentField, AppointmentRequest } from "./schema";
+import type { AppointmentField } from "./config";
+import type { AppointmentRequest } from "./schema";
 
 /** A validated request that has been accepted by the system. */
 export interface Appointment extends AppointmentRequest {
@@ -6,21 +7,42 @@ export interface Appointment extends AppointmentRequest {
   createdAt: string;
 }
 
+/** Clinic details from the CMS that channels need at booking time. */
+export interface BookingContext {
+  /** Brand name for staff-facing summaries. */
+  clinicName: string;
+  /** Default inbox for the email channel. */
+  clinicEmail: string;
+  /** Prefix of reference ids (`[A-Z0-9]{0,6}`), e.g. "MC" → "MC-7K2Q9D". */
+  referencePrefix: string;
+  /** BCP 47 tag used to format dates in messages. */
+  language: string;
+}
+
 /**
- * Output port: anything that should hear about a new appointment
- * (email inbox, Slack/Sheets webhook, CRM, logs…). Strategy pattern —
+ * Primary channel: stores the request where the clinic works on it (the backend's
+ * enquiries inbox) and issues its reference id.
+ */
+export interface AppointmentRepository {
+  readonly channel: string;
+  save(request: AppointmentRequest, context: BookingContext): Promise<{ referenceId: string }>;
+}
+
+/**
+ * Output port: anything else that should hear about a new appointment
+ * (email inbox, Slack/Sheets webhook, logs…). Strategy pattern —
  * the service depends on this interface, never on a concrete channel.
  */
 export interface AppointmentNotifier {
   readonly channel: string;
   /** True when this channel actually reaches clinic staff (logs don't). */
   readonly reachesClinic: boolean;
-  notify(appointment: Appointment): Promise<void>;
+  notify(appointment: Appointment, context: BookingContext): Promise<void>;
 }
 
 export interface BookingResult {
   appointment: Appointment;
-  /** At least one staff-facing channel accepted the request. */
+  /** The repository or at least one staff-facing notifier accepted the request. */
   delivered: boolean;
 }
 
@@ -35,7 +57,8 @@ export type AppointmentFormState =
       status: "success";
       referenceId: string;
       delivered: boolean;
-      whatsappUrl: string;
+      /** Pre-filled WhatsApp message to the clinic; null when the CMS has no WhatsApp number. */
+      whatsappUrl: string | null;
       patientName: string;
     };
 

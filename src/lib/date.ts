@@ -15,9 +15,30 @@ export function addDaysISO(isoDate: string, days: number): string {
   return date.toISOString().slice(0, 10);
 }
 
-/** "2026-10-20" → "Tue, 20 Oct 2026" */
-export function formatISODate(isoDate: string, locale = "en-IN"): string {
-  return new Intl.DateTimeFormat(locale, {
+/** The given IANA time zone when the runtime knows it, else `fallback`. */
+export function resolveTimeZone(timeZone: string, fallback = "UTC"): string {
+  if (!timeZone) return fallback;
+  try {
+    new Intl.DateTimeFormat("en", { timeZone });
+    return timeZone;
+  } catch {
+    return fallback;
+  }
+}
+
+/** The given BCP 47 language tag when valid, else undefined (runtime default). */
+function resolveLocale(locale: string | undefined): string | undefined {
+  if (!locale) return undefined;
+  try {
+    return Intl.DateTimeFormat.supportedLocalesOf(locale).length > 0 ? locale : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** "2026-10-20" → "Tue, 20 Oct 2026" (format follows `locale`). */
+export function formatISODate(isoDate: string, locale?: string): string {
+  return new Intl.DateTimeFormat(resolveLocale(locale), {
     weekday: "short",
     day: "numeric",
     month: "short",

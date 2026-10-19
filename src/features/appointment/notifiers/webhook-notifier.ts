@@ -10,11 +10,11 @@ export function createWebhookNotifier(url: string): AppointmentNotifier {
   return {
     channel: "webhook",
     reachesClinic: true,
-    async notify(appointment) {
+    async notify(appointment, context) {
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: formatStaffSummary(appointment), appointment }),
+        body: JSON.stringify({ text: formatStaffSummary(appointment, context), appointment }),
         signal: AbortSignal.timeout(8_000),
       });
       if (!response.ok) throw new Error(`Webhook responded ${response.status}`);

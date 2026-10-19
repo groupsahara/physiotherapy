@@ -7,9 +7,8 @@ export function createConsoleNotifier(): AppointmentNotifier {
     reachesClinic: false,
     async notify(appointment) {
       const maskedPhone = appointment.phone.replace(/\d(?=\d{3})/g, "•");
-      console.info(
-        `[appointments] ${appointment.referenceId} · ${appointment.service} · ${appointment.visitType} · ${maskedPhone}`,
-      );
+      const details = [appointment.treatment?.value, appointment.visitType?.value, maskedPhone].filter(Boolean);
+      console.info(`[appointments] ${appointment.referenceId} · ${details.join(" · ")}`);
     },
   };
 }

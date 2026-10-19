@@ -1,80 +1,129 @@
 import type { LucideIcon } from "lucide-react";
 import { ArrowUpRight, House, Mail, MapPin, Phone } from "lucide-react";
 import type { ReactNode } from "react";
-import { siteConfig } from "@/config/site";
-import { addressLines, mailtoHref, mapsDirectionsHref, mapsEmbedSrc, telHref } from "@/lib/contact-links";
+import { callAction } from "@/lib/cms/selectors";
+import type { Site } from "@/lib/cms/types";
+import { cn } from "@/lib/cn";
+import { addressLines, joinParts, mailtoHref, mapsDirectionsHref, mapsEmbedSrc, telHref } from "@/lib/contact-links";
+import { buildAppointmentFormConfig } from "@/features/appointment/config";
 import { AppointmentForm } from "@/features/appointment/components/AppointmentForm";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 
-export function ContactSection() {
-  const { phones, email, address, mapsPlaceName } = siteConfig.contact;
+interface ContactCardContent {
+  key: string;
+  icon: LucideIcon;
+  title: string;
+  body: ReactNode;
+}
 
-  return (
-    <Section id="contact" labelledBy="contact-title">
-      <SectionHeading
-        id="contact-title"
-        eyebrow="Book an appointment"
-        title="Start your recovery today"
-        description="Send a request and we'll call you back to confirm — or reach us directly by phone, WhatsApp or email."
-      />
+export function ContactSection({ site }: { site: Site }) {
+  const content = site.documents["section.contact"];
+  const identity = site.documents["site.identity"];
+  const { phones, email, address, mapsPlaceName } = site.documents["site.contact"];
+  const lines = addressLines(address);
+  const cards: ContactCardContent[] = [];
 
-      <div className="mt-14 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-        <ul className="grid content-start gap-4">
-          <ContactCard icon={MapPin} title="Visit the clinic" delay={0}>
-            <address className="not-italic">
-              {addressLines(address).map((line) => (
-                <span key={line} className="block">
-                  {line}
-                </span>
-              ))}
-            </address>
+  if (lines.length > 0) {
+    cards.push({
+      key: "visit",
+      icon: MapPin,
+      title: content.visitTitle,
+      body: (
+        <>
+          <address className="not-italic">
+            {lines.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
+          </address>
+          {content.directionsLabel ? (
             <a
               href={mapsDirectionsHref(mapsPlaceName, address)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-brand hover:underline"
             >
-              Get directions <ArrowUpRight aria-hidden className="size-4" />
+              {content.directionsLabel} <ArrowUpRight aria-hidden className="size-4" />
             </a>
-          </ContactCard>
+          ) : null}
+        </>
+      ),
+    });
+  }
 
-          <ContactCard icon={Phone} title="Call us" delay={80}>
-            {phones.map((phone) => (
-              <a key={phone.e164} href={telHref(phone)} className="block font-semibold text-fg hover:text-brand">
-                {phone.display}
-              </a>
-            ))}
-          </ContactCard>
+  if (phones.length > 0) {
+    cards.push({
+      key: "call",
+      icon: Phone,
+      title: content.callTitle,
+      body: phones.map((phone) => (
+        <a key={phone.e164} href={telHref(phone)} className="block font-semibold text-fg hover:text-brand">
+          {phone.display}
+        </a>
+      )),
+    });
+  }
 
-          <ContactCard icon={Mail} title="Email" delay={160}>
-            <a href={mailtoHref(email, "Appointment enquiry")} className="font-semibold break-all text-fg hover:text-brand">
-              {email}
-            </a>
-          </ContactCard>
+  if (email) {
+    cards.push({
+      key: "email",
+      icon: Mail,
+      title: content.emailTitle,
+      body: (
+        <a href={mailtoHref(email, content.emailSubject)} className="font-semibold break-all text-fg hover:text-brand">
+          {email}
+        </a>
+      ),
+    });
+  }
 
-          <ContactCard icon={House} title="Home visits" delay={240}>
-            Available on call — ring either number to schedule a visit at your home.
-          </ContactCard>
+  if (content.homeVisitTitle || content.homeVisitText) {
+    cards.push({ key: "home-visit", icon: House, title: content.homeVisitTitle, body: content.homeVisitText });
+  }
+
+  const showMap = content.showMap && (lines.length > 0 || mapsPlaceName !== "");
+
+  return (
+    <Section id="contact" labelledBy="contact-title">
+      <SectionHeading
+        id="contact-title"
+        eyebrow={content.eyebrow}
+        title={content.title}
+        description={content.description}
+      />
+
+      <div className="mt-14 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+        <ul className="grid content-start gap-4">
+          {cards.map((card, i) => (
+            <ContactCard key={card.key} icon={card.icon} title={card.title} delay={i * 80}>
+              {card.body}
+            </ContactCard>
+          ))}
         </ul>
 
         <Reveal delay={120} className="card p-6 sm:p-8">
-          <h3 className="font-display text-xl font-bold">Request an appointment</h3>
-          <p className="mt-1 mb-6 text-[15px] text-muted">Takes less than a minute.</p>
-          <AppointmentForm />
+          {content.formTitle ? (
+            <h3 className={cn("font-display text-xl font-bold", !content.formSubtitle && "mb-6")}>{content.formTitle}</h3>
+          ) : null}
+          {content.formSubtitle ? <p className="mt-1 mb-6 text-[15px] text-muted">{content.formSubtitle}</p> : null}
+          <AppointmentForm config={buildAppointmentFormConfig(site)} callAction={callAction(site)} />
         </Reveal>
       </div>
 
-      <Reveal className="mt-8 overflow-hidden rounded-3xl border border-border bg-surface-2 shadow-card">
-        <iframe
-          title={`Map showing ${siteConfig.name} clinic, ${address.locality}`}
-          src={mapsEmbedSrc(mapsPlaceName, address)}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="block h-85 w-full border-0 dark:[filter:invert(0.9)_hue-rotate(180deg)_saturate(0.8)]"
-        />
-      </Reveal>
+      {showMap && (
+        <Reveal className="mt-8 overflow-hidden rounded-3xl border border-border bg-surface-2 shadow-card">
+          <iframe
+            title={`Map showing ${joinParts([identity.name, address.locality], ", ")}`}
+            src={mapsEmbedSrc(mapsPlaceName, address)}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="block h-85 w-full border-0 dark:[filter:invert(0.9)_hue-rotate(180deg)_saturate(0.8)]"
+          />
+        </Reveal>
+      )}
     </Section>
   );
 }
@@ -96,7 +145,7 @@ function ContactCard({
         <Icon aria-hidden className="size-6" />
       </span>
       <div className="text-[15px] leading-relaxed text-muted">
-        <h3 className="mb-1 font-display text-base font-bold text-fg">{title}</h3>
+        {title ? <h3 className="mb-1 font-display text-base font-bold text-fg">{title}</h3> : null}
         {children}
       </div>
     </Reveal>
