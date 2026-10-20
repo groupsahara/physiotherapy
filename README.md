@@ -46,6 +46,7 @@ the API is up (the build log says so). Start the backend first to prerender the 
 | `WEBSITE_API_KEY` | Sent as `x-site-key` with appointment requests; equals the backend's `WEBSITE_API_KEY` |
 | `REVALIDATE_SECRET` | Secret for `POST /api/revalidate`; equals the backend's `WEBSITE_REVALIDATE_SECRET` |
 | `MEDIA_ORIGINS` | Extra comma-separated origins that serve CMS images (e.g. the backend's `MEDIA_PUBLIC_BASE_URL`, a CDN). `$API_URL/media/**` is always allowed |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Optional: Google Maps Embed API key for the contact map (inlined at build; restrict it by HTTP referrer). Unset → key-less embed |
 | `RESEND_API_KEY`, `APPOINTMENT_EMAIL_TO`, `APPOINTMENT_EMAIL_FROM` | Optional: also email each request to the clinic via [Resend](https://resend.com) |
 | `APPOINTMENT_WEBHOOK_URL` | Optional: also POST each request as JSON (Slack, Discord, Zapier, Google Sheets via Apps Script…) |
 
