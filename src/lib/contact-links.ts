@@ -44,7 +44,13 @@ export function mapsDirectionsHref(placeName: string, address: PostalAddress) {
   return `https://www.google.com/maps/search/?api=1&query=${mapsQuery(placeName, address)}`;
 }
 
-/** Key-less Google Maps embed URL. */
+/** Browser key for the Maps Embed API (env `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`); it ends up in the page HTML. */
+const mapsApiKey = (process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "").trim();
+
+/** Maps Embed API URL when a key is configured, otherwise the key-less embed. */
 export function mapsEmbedSrc(placeName: string, address: PostalAddress) {
+  if (mapsApiKey) {
+    return `https://www.google.com/maps/embed/v1/place?key=${encodeURIComponent(mapsApiKey)}&q=${mapsQuery(placeName, address)}&zoom=16`;
+  }
   return `https://maps.google.com/maps?q=${mapsQuery(placeName, address)}&z=16&output=embed`;
 }
