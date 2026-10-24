@@ -10,6 +10,7 @@ import { AppointmentForm } from "@/features/appointment/components/AppointmentFo
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
+import { MapFrame } from "./MapFrame";
 
 interface ContactCardContent {
   key: string;
@@ -114,12 +115,10 @@ export function ContactSection({ site }: { site: Site }) {
       </div>
 
       {showMap && (
-        <Reveal className="mt-8 overflow-hidden rounded-3xl border border-border bg-surface-2 shadow-card">
-          <iframe
+        <Reveal className="relative mt-8 overflow-hidden rounded-3xl border border-border bg-surface-2 shadow-card">
+          <MapFrame
             title={`Map showing ${joinParts([identity.name, address.locality], ", ")}`}
             src={mapsEmbedSrc(mapsPlaceName, address)}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
             className="block h-85 w-full border-0 dark:[filter:invert(0.9)_hue-rotate(180deg)_saturate(0.8)]"
           />
         </Reveal>

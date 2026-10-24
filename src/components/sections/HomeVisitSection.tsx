@@ -80,6 +80,7 @@ export function HomeVisitSection({ site }: { site: Site }) {
                   fill
                   sizes="40vw"
                   className="bg-white/10 object-cover [mask-image:linear-gradient(to_right,transparent,black_30%)]"
+                  skeletonClassName="bg-white/10 [mask-image:linear-gradient(to_right,transparent,black_30%)]"
                 />
               </div>
             )}

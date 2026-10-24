@@ -1,12 +1,13 @@
 "use client";
 
 import { startTransition, useActionState, useEffect, useRef, useState, type FormEvent } from "react";
-import { CircleAlert, LoaderCircle, Send } from "lucide-react";
+import { CircleAlert, Send } from "lucide-react";
 import type { LinkAction } from "@/lib/cms/selectors";
 import { addDaysISO } from "@/lib/date";
 import { cn } from "@/lib/cn";
 import { useTodayISO } from "@/hooks/use-today";
 import { buttonClasses } from "@/components/ui/button";
+import { Loader, ProcessingOverlay } from "@/components/ui/Loader";
 import { requestAppointment } from "../actions";
 import { HONEYPOT_FIELD, NAME_MAX_LENGTH, type AppointmentFormConfig } from "../config";
 import { onTreatmentPrefill } from "../prefill";
@@ -224,7 +225,7 @@ function AppointmentFormInner({
         <button type="submit" disabled={isPending} className={cn(buttonClasses({ size: "lg" }), "w-full")}>
           {isPending ? (
             <>
-              <LoaderCircle aria-hidden className="size-5 animate-spin" />
+              <Loader className="size-5" label="Sending request" />
               Sending request…
             </>
           ) : (
@@ -236,6 +237,7 @@ function AppointmentFormInner({
         </button>
         {config.footnote ? <p className="text-center text-[13px] text-muted">{config.footnote}</p> : null}
       </div>
+      <ProcessingOverlay active={isPending} label="Sending your request" />
     </form>
   );
 }
