@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 import type { ImageSource } from "@/lib/cms/media";
 import { cn } from "@/lib/cn";
+import { LoadingImage } from "@/components/ui/LoadingImage";
 
 export interface GalleryPhoto {
   id: string;
@@ -68,7 +68,7 @@ export function SessionGallery({ photos }: { photos: readonly GalleryPhoto[] }) 
               aria-label={`View photo: ${photo.title}`}
               className="group relative block size-full overflow-hidden rounded-2xl bg-surface-2 text-left sm:rounded-3xl"
             >
-              <Image
+              <LoadingImage
                 src={photo.image.src}
                 alt={photo.image.alt}
                 unoptimized={photo.image.unoptimized}
@@ -116,7 +116,7 @@ export function SessionGallery({ photos }: { photos: readonly GalleryPhoto[] }) 
         {active && (
           <figure className="relative">
             <div className="relative aspect-3/2 max-h-[75vh] w-full overflow-hidden rounded-2xl bg-black">
-              <Image
+              <LoadingImage
                 key={active.id}
                 src={active.image.src}
                 alt={active.image.alt}

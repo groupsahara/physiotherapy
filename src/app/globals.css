@@ -25,6 +25,7 @@
   --star: #f59e0b;
   --footer-bg: #061733;
   --hero-glow: rgb(21 87 214 / 0.12);
+  --skeleton-shine: rgb(255 255 255 / 0.7);
   --grid-line: rgb(21 87 214 / 0.07);
   --shadow-card: 0 1px 2px rgb(15 35 75 / 0.04), 0 16px 40px -20px rgb(15 35 75 / 0.18);
   --shadow-lift: 0 2px 4px rgb(15 35 75 / 0.05), 0 28px 60px -24px rgb(15 35 75 / 0.3);
@@ -47,6 +48,7 @@
   --star: #fbbf24;
   --footer-bg: #030a18;
   --hero-glow: rgb(59 130 246 / 0.22);
+  --skeleton-shine: rgb(255 255 255 / 0.07);
   --grid-line: rgb(138 182 255 / 0.06);
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px -20px rgb(0 0 0 / 0.6);
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 28px 60px -24px rgb(0 0 0 / 0.75);
@@ -171,6 +173,23 @@
     resize: vertical;
   }
 
+  /* A placeholder for content that is still loading, with a highlight running across it. Only
+     `transform` animates, so the sweep stays on the compositor. */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--surface-2);
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  }
+
   select.field {
     appearance: none;
     padding-right: 2.5rem;
@@ -205,6 +224,94 @@
 
 .animate-float {
   animation: float-y 6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* The loader (components/ui/Loader.tsx) and the processing overlay. */
+@keyframes loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader-pulse {
+  0%,
+  100% {
+    transform: scale(0.65);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+}
+
+@keyframes loader-dot-1 {
+  0%,
+  24% {
+    opacity: 0;
+  }
+  25%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes loader-dot-2 {
+  0%,
+  49% {
+    opacity: 0;
+  }
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes loader-dot-3 {
+  0%,
+  74% {
+    opacity: 0;
+  }
+  75%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes loader-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.animate-loader-spin {
+  animation: loader-spin 0.9s linear infinite;
+}
+
+.animate-loader-pulse {
+  animation: loader-pulse 1.3s ease-in-out infinite;
+}
+
+.animate-loader-dot-1 {
+  animation: loader-dot-1 1.6s linear infinite;
+}
+
+.animate-loader-dot-2 {
+  animation: loader-dot-2 1.6s linear infinite;
+}
+
+.animate-loader-dot-3 {
+  animation: loader-dot-3 1.6s linear infinite;
+}
+
+.animate-loader-fade {
+  animation: loader-fade 150ms ease-out;
 }
 
 /* Smooth cross-fade when the theme changes (View Transitions API). */
