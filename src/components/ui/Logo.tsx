@@ -41,7 +41,7 @@ export function Logo({ identity, className, inverted = false }: LogoProps) {
       {logo ? (
         <span className="relative size-10 shrink-0">
           {/* Decorative next to the name; the image carries the name only when there is no text. */}
-          <ContentImage image={logo} alt={name ? "" : logo.alt} fill sizes="40px" className="object-contain" />
+          <ContentImage image={logo} alt={name ? "" : logo.alt} fill sizes="40px" className="object-contain" skeletonClassName="rounded-xl" />
         </span>
       ) : (
         <LogoMark />
